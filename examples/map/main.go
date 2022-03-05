@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
 	go_generics "github.com/rekhin/go-generics"
+	"github.com/rekhin/go-generics/inproc"
 )
 
 func main() {
@@ -27,26 +29,31 @@ func main() {
 	fmt.Println([]string{"Hello, ", "playground\n"})
 
 	// channel
-	ch := go_generics.NewChannel(make(chan int))
+	c := make(chan int)
+	s := inproc.NewSender(c)
 	ctx, cancel := context.WithCancel(context.Background())
 	var wg sync.WaitGroup
 	send := func(message int) {
 		wg.Add(1)
 		go func() {
-			ch.Send(ctx, message)
+			if err := s.Send(ctx, message); err != nil {
+				log.Printf("send failed: %s", err)
+			}
 			time.Sleep(10 * time.Millisecond) // даём время прочитать из канала
 			wg.Done()
 		}()
 	}
 
+	r := inproc.NewReceiver(c)
 	var got []int
 	go func() {
 		for {
-			message, ok := ch.Receive(ctx)
-			if !ok {
-				return
+			i, err := r.Receive(ctx)
+			if err != nil {
+				log.Printf("receive failed: %s", err)
+				break
 			}
-			got = append(got, message)
+			got = append(got, i)
 		}
 	}()
 

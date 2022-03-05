@@ -4,30 +4,26 @@ import "context"
 
 type Channel[M any] chan M
 
-func MakeChannel[M any](ch chan M) Channel[M] {
-	return ch
+func NewChannel[M any](c chan M) Channel[M] {
+	return c
 }
 
-func MakeChannelWithBuffer[M any](size int) Channel[M] {
-	return make(chan M, size)
-}
-
-func (ch Channel[M]) Send(ctx context.Context, message M) bool {
+func (c Channel[M]) Send(ctx context.Context, message M) bool {
 	select {
 	case <-ctx.Done():
 		return false
-	case ch <- message:
+	case c <- message:
 		return true
 	}
 
 }
 
-func (ch Channel[M]) Receive(ctx context.Context) (message M, ok bool) {
+func (c Channel[M]) Receive(ctx context.Context) (message M, ok bool) {
 	select {
 	case <-ctx.Done():
 		return message, false
 
-	case message = <-ch:
+	case message = <-c:
 		return message, true
 	}
 }

@@ -11,11 +11,11 @@ import (
 func main() {
 	ctx := context.Background()
 
-	ch := go_generics.MakeChannel(make(chan int))
+	c := go_generics.NewChannel(make(chan int))
 
 	go func() {
 		for {
-			i, ok := ch.Receive(ctx)
+			i, ok := c.Receive(ctx)
 			if ok {
 				fmt.Println("receive: ", i)
 			}
@@ -23,7 +23,7 @@ func main() {
 	}()
 
 	for i := 0; i < 1000; i++ {
-		ch.Send(ctx, i)
+		c.Send(ctx, i)
 	}
 
 	time.Sleep(1000 * time.Millisecond)

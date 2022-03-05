@@ -22,7 +22,6 @@ func (c Channel[M]) Receive(ctx context.Context) (message M, ok bool) {
 	select {
 	case <-ctx.Done():
 		return message, false
-
 	case message = <-c:
 		return message, true
 	}

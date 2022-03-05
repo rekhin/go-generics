@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+
+	go_generics "github.com/rekhin/go-generics"
 )
 
-// go run -gcflags=-G=3 main.go map.go
-
 func main() {
-	var m safeMap[string, int] = newMutexMap(map[string]int{"": 0})
+	var m go_generics.SafeMap[string, int] = go_generics.NewMutexMap(map[string]int{"": 0})
 	m.Set("hello", 11)
 	m.Set("world", 22)
 	m.SetMany(map[string]int{
@@ -21,5 +21,5 @@ func main() {
 	fmt.Println(m)
 	fmt.Println("lenght:", m.Lenght())
 
-	print([]string{"Hello, ", "playground\n"})
+	fmt.Println([]string{"Hello, ", "playground\n"})
 }

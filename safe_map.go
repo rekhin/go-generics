@@ -1,6 +1,6 @@
-package main
+package go_generics
 
-type safeMap[K comparable, V any] interface{
+type SafeMap[K comparable, V any] interface {
 	Get(key K) (value V, ok bool)
 	Set(key K, value V)
 	SetMany(from map[K]V)

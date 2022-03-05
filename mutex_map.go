@@ -1,35 +1,35 @@
-package main
+package go_generics
 
 import (
 	"fmt"
 	"sync"
 )
 
-type mutexMap[K comparable, V any] struct {
+type MutexMap[K comparable, V any] struct {
 	mtx sync.RWMutex
-	m 	map[K]V
+	m   map[K]V
 }
 
-var a safeMap[int, int] = new(mutexMap[int, int])
+var _ SafeMap[int, int] = new(MutexMap[int, int])
 
-func newMutexMap[K comparable, V any](m map[K]V) *mutexMap[K,V] {
-	return &mutexMap[K,V]{m: m}
+func NewMutexMap[K comparable, V any](m map[K]V) *MutexMap[K, V] {
+	return &MutexMap[K, V]{m: m}
 }
 
-func (m *mutexMap[K,V]) Get(key K) (value V, ok bool) {
+func (m *MutexMap[K, V]) Get(key K) (value V, ok bool) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	value, ok = m.m[key]
 	return value, ok
 }
 
-func (m *mutexMap[K,V]) Set(key K, value V) {
+func (m *MutexMap[K, V]) Set(key K, value V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	m.m[key] = value
 }
 
-func (m *mutexMap[K,V]) SetMany(from map[K]V) {
+func (m *MutexMap[K, V]) SetMany(from map[K]V) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	for key, value := range from {
@@ -37,19 +37,19 @@ func (m *mutexMap[K,V]) SetMany(from map[K]V) {
 	}
 }
 
-func (m *mutexMap[K,V]) Delete(key K) {
+func (m *MutexMap[K, V]) Delete(key K) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	delete(m.m, key)
 }
 
-func (m *mutexMap[K,V]) Lenght() int {
+func (m *MutexMap[K, V]) Lenght() int {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	return len(m.m)
 }
 
-func (m *mutexMap[K,V]) Copy() map[K]V {
+func (m *MutexMap[K, V]) Copy() map[K]V {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	to := make(map[K]V, len(m.m))
@@ -59,7 +59,7 @@ func (m *mutexMap[K,V]) Copy() map[K]V {
 	return to
 }
 
-func (m *mutexMap[K,V]) Range(f func(K, V) bool) {
+func (m *MutexMap[K, V]) Range(f func(K, V) bool) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	for key, value := range m.m {
@@ -69,7 +69,7 @@ func (m *mutexMap[K,V]) Range(f func(K, V) bool) {
 	}
 }
 
-func (m *mutexMap[K,V]) String() string {
+func (m *MutexMap[K, V]) String() string {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	return fmt.Sprintf("%+v", m.m)
